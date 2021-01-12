@@ -8,7 +8,7 @@
          <oscFrequency>5000000</oscFrequency>
       </PLL>
       <clockType>PLL</clockType>
-      <frequency>50000000</frequency>
+      <frequency>10000000</frequency>
    </Clock>
    <ControlReg>
       <pc>0</pc>

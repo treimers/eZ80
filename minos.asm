@@ -1,37 +1,37 @@
 	cpu=EZ80F91
-	.assume	ADL = 0			;Z80-Mode
+	.assume	adl=0			;Z80-Mode
 
 	xdef	tasktable
 	xdef	initschedule
 	xdef	createtask
 
 	xref	multiply
-	xref	divide
 
 	include	"minos.inc"
-
-	segment	data
-
-taskcount:				; the count reflecting the total number of tasks
-	ds	1
-tasktable:				; the task table
-	ds	tasksize * tasks
-stack:
-	ds	200			; the kernel stack
-topstack:				; top of stack
+	include	"error.inc"
 
 	segment	code
 
-initschedule:				; init the mini ROS
+; init the minOS
+;
+; parameter
+;   -
+; returns
+;   -
+initschedule:
+	; clear vars
 	xor	a
 	ld	(taskcount),a
 	ld	hl,tasktable
 	ld	(hl),a
 	ld	d,h
-	ld	l,e
+	ld	e,l
 	inc	de
-	ld	bc,tasksize * tasks-1
+	ld	bc,tasksize * maxtasks-1
 	ldir
+	; create idle task
+	ld	de,idletaskdef
+	call	ctinternal
 	ret
 
 schedule:				; the main scheduler
@@ -43,7 +43,7 @@ schedule:				; the main scheduler
 	ld	ix,tasktable
 	ld	de,tasksize
 loop:
-	ld	a,(ix+stasktable.state)
+	ld	a,(ix+stask.state)
 	cp 	ready
 	jr	z,found
 	add	ix,de
@@ -56,36 +56,46 @@ idle:
 
 found:					; ix points to next runnable task
 
-; creates a new task using the given parameter and sets the task state to ready
+
+; creates a new task without priority check (internally used)
 ;
-; parameter (16 bit on stack)
-;   1. the task priority (1..254)
-;   2. the task period (0 means non-periodic task)
-;   3. the initial program counter
-;   4. the initial task stack pointer
-;   5. the pointer to the task name
-;
+; parameter
+;   de = pointer to task definition
 ; returns
 ;   carry flag and a='error number' in case of error
 ;   no carry flag and a='task number' otherwise
+ctinternal:
+	; flag: create without prio check
+	ld	b,0
+	jr	ctdocreate
+
+; creates a new task using the given parameter and sets the task state to ready
 ;
-; register used
-;   af, bc, de, hl, ix, iy
+; parameter
+;   de = pointer to task definition
+; returns
+;   carry flag and a='error number' in case of error
+;   no carry flag and a='task number' otherwise
 createtask:
-	; get pointer to caller parameter, return address plus parameter (iy)
-	ld	iy,2 + 2 * 5
-	add	iy,sp
+	; flag: create with prio check
+	ld	b,1
+ctdocreate:
+	; get pointer to caller parameter (iy)
+	ld	iy,0
+	add	iy,de
+	ld	a,(iy+staskdef.prio)
+	djnz	ctnocheck
 	; check 0 < prio < 255
-	ld	a,(iy-2)
 	or	a
 	jr	z,cterror1
 	cp	255
 	jr	nc,cterror1
+ctnocheck:
 	; save prio for later use
 	ld	c,a
 	; check for too many tasks
 	ld	a,(taskcount)
-	cp	tasks
+	cp	maxtasks
 	jr	nc,cterror2
 	; iterate over tasks in task table
 	ld	ix,tasktable
@@ -93,12 +103,12 @@ createtask:
 	ld	b,a
 	; append directly if task table is empty
 	or	a
-	jr	z,ctinit
+	jr	z,ctinittask
 	; restore prio
 	ld	a,c
 ctloop:
 	; check if prio is less than prio of current task
-	ld	c,(ix+stasktable.prio)
+	ld	c,(ix+stask.prio)
 	cp	c
 	jr	nc,ctnext
 	; create slot for new task by moving all remaining tasks
@@ -121,37 +131,37 @@ ctloop:
 	ex	de,hl
 	; ... move remaining tasks
 	lddr
-	jr	ctinit
+	jr	ctinittask
 ctnext:
 	; go to next task until end of task table reached
 	add	ix,de
 	djnz	ctloop
-ctinit:
+ctinittask:
 	; insert task into task table slot
 	; ... state
 	ld	c,ready
-	ld	(ix+stasktable.state),c
+	ld	(ix+stask.state),c
 	; ... prio
-	ld	b,(iy-2)
-	ld	(ix+stasktable.prio),b
+	ld	b,(iy+staskdef.prio)
+	ld	(ix+stask.prio),b
 	; ... period
-	ld	c,(iy-4)
-	ld	(ix+stasktable.initperiod),c
+	ld	c,(iy+staskdef.period)
+	ld	(ix+stask.initperiod),c
 	; ... pc
-	ld	c,(iy-6)
-	ld	b,(iy-5)
-	ld	(ix+stasktable.initpc),c
-	ld	(ix+stasktable.initpc+1),b
+	ld	c,(iy+staskdef.pc)
+	ld	b,(iy+staskdef.pc+1)
+	ld	(ix+stask.initpc),c
+	ld	(ix+stask.initpc+1),b
 	; ... sp
-	ld	c,(iy-8)
-	ld	b,(iy-7)
-	ld	(ix+stasktable.initstack),c
-	ld	(ix+stasktable.initstack+1),b
+	ld	c,(iy+staskdef.stack)
+	ld	b,(iy+staskdef.stack+1)
+	ld	(ix+stask.initstack),c
+	ld	(ix+stask.initstack+1),b
 	; ... name
-	ld	e,(iy-10)
-	ld	d,(iy-9)
-	ld	(ix+stasktable.name),e
-	ld	(ix+stasktable.name+1),d
+	ld	e,(iy+staskdef.name)
+	ld	d,(iy+staskdef.name+1)
+	ld	(ix+stask.name),e
+	ld	(ix+stask.name+1),d
 	; increment task count
 	ld	hl,taskcount
 	ld	a,(hl)
@@ -162,14 +172,38 @@ ctinit:
 
 cterror1:
 	; error: illegal priority
-	ld	a,1
+	ld	a,err_ill_prio
 	scf
 	ret
 
 cterror2:
 	; error: too many tasks
-	ld	a,2
+	ld	a,err_too_mntsk
 	scf
 	ret
+
+idletaskdef:
+	db	255			;prio
+	db	0			;period
+	dw	idle			;pc
+	dw	topidlestack		;stack
+	dw	idlename
+
+idlename:
+	db	'idle-task',0
+
+	segment	data
+
+taskcount:				; the count reflecting the total number of tasks
+	ds	1
+tasktable:				; the task table
+	ds	tasksize * maxtasks
+stack:
+	ds	32			; the kernel stack
+topstack:				; top of kernel stack
+
+idlestack:
+	ds	32			; the kernel stack
+topidlestack:				; top of kernel stack
 
 	end
