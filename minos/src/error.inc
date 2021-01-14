@@ -1,3 +1,4 @@
+; list of error numbers
 err_ctl_int	equ	1			; control flow: unexpected interrupt
 err_ctl_restart	equ	2			; control flow: unexpected restart operation
 err_ctl_nmi	equ	3			; control flow: unexpected nmi

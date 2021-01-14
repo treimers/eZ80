@@ -1,7 +1,8 @@
 maxtasks	equ	20		; maximal number of tasks
-blocked		equ	'B'		; task state blocked
-ready		equ	'R'		; task state ready
-stopped		equ	'S'		; task state stopped
+
+stateBlocked	equ	'B'		; task state blocked
+stateReady	equ	'R'		; task state ready
+stateStopped	equ	'S'		; task state stopped
 
 stask		.struct			; the task structure
 state		ds	1		; the current task state

@@ -10,7 +10,7 @@
 	xref	minosCreateTask
 	xref	inttab
 	xref	timerInit
-	xref	minosKernelstack
+	xref	minosKernelStack
 
 	segment	code
 
@@ -21,7 +21,7 @@ test:
 	ld	(count2),hl
 	ld	(count3),hl
 	; load stack pointer
-	ld	sp,minosKernelstack
+	ld	sp,minosKernelStack
 	; test arithmetic
 	ld	bc,123
 	ld	hl,22

@@ -6,7 +6,7 @@
 	xdef	minosCreateTask
 	xdef	minosSystemTick
 	xdef	minosSaveContext
-	xdef	minosKernelstack
+	xdef	minosKernelStack
 
 	xref	multiply
 	xref	error
@@ -115,7 +115,7 @@ mschedule:
 ; searches for runnable tasks with highest priority.
 ; idles if no runnable task available.
 minosMain:
-	ld	sp,minosKernelstack
+	ld	sp,minosKernelStack
 	xor	a
 	ld	(requiresched),a
 	ld	hl, taskcount
@@ -127,7 +127,7 @@ minosMain:
 	ld	b,a
 mschedloop:
 	ld	a,(ix+stask.state)
-	cp 	ready
+	cp 	stateReady
 	jr	z,mschedfound
 	add	ix,de
 	djnz	mschedloop
@@ -150,7 +150,7 @@ mschedfound:
 ; sets task state to stopped and starts rescheduling.
 mschedendtask:
 	ld	ix,(currenttask)
-	ld	(ix+stask.state),stopped
+	ld	(ix+stask.state),stateStopped
 	ld	bc,0
 	ld	(currenttask),bc
 	jr	minosMain
@@ -186,13 +186,13 @@ stloop:
 	; check busy
 	ld	a,(ix+stask.state)
 	jr	z,stcontinue
-	cp	ready
+	cp	stateReady
 	jr	z,sterror
 	; decrement period, continue if not zero
 	dec	(ix+stask.period)
 	jr	nz,stcontinue
 	; set new state
-	ld	(ix+stask.state),ready
+	ld	(ix+stask.state),stateReady
 	; reload period
 	ld	a,(ix+stask.initperiod)
 	ld	(ix+stask.period),a
@@ -230,7 +230,7 @@ sterror:
 	ld	a,err_tsk_busy
 	jp	error
 
-; creates a new task using the given parameter and sets the task state to ready
+; creates a new task using the given parameter and sets the task state to stopped
 ;
 ; parameters:
 ;   de = pointer to task definition
@@ -279,7 +279,7 @@ ctloop:
 ctinittask:
 	; insert task into task table slot
 	; ... state
-	ld	(ix+stask.state),stopped
+	ld	(ix+stask.state),stateStopped
 	; ... prio
 	ld	b,(iy+staskdef.prio)
 	ld	(ix+stask.prio),b
@@ -364,6 +364,6 @@ tasktable:				; the task table
 varend:					; end of variable section
 
 	ds	32			; the kernel stack
-minosKernelstack:			; top of kernel stack
+minosKernelStack:			; top of kernel stack
 
 	end
