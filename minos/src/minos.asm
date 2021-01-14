@@ -16,7 +16,7 @@
 
 	segment	code
 
-; initializes the minOS
+; Initializes the minOS operating systeme.
 ;
 ; parameter
 ;   -
@@ -31,7 +31,25 @@ minosInit:
 	ldir
 	ret
 
-; saves the context of interrupted processing.
+; Saves the processor context.
+;
+; This routine should be called from an interrupt service routine prior
+; to invocation of other minOS functions like handle system timer,
+; start a task or others.
+;
+; The invocation must be done preserving the original stack pointer of the isr,
+; no push operations may occure before calling this routine.
+;
+; The interrupt service routine must end without (!) enabling interrupts using
+; a reti instruction. minosSaveContext will replace the return address
+; saved on stack during interrupt acknowledge and will take care for task
+; scheduling and enabling of interrupts afterwards.
+;
+; Example:
+;    myIsr:
+;      call    minosSaveContext
+;      ...                          ; do isr handling
+;      reti
 ;
 ; parameters:
 ;   -
@@ -61,8 +79,9 @@ minosSaveContext:
 	; return to caller
 	jp	(hl)
 
-; restores the context of interrupted processing,
-; enables interrupts again and returns to point of interruption.
+; Restores processor context saved by minosSaveContext and returns to
+; point of interruption. Interrupts will be enabled before return is
+; executed.
 ;
 ; parameters:
 ;   -
@@ -88,11 +107,11 @@ minosRestoreContext:
 	ei
 	ret
 
-; invokes the scheduling at end of an interrupt routine.
+; Invokes scheduling after interrupt routine.
 ;
-; restores context of interrupted processing if no new scheduling is required.
-; searches for runnable tasks with highest priority otherwise.
-; idles if no runnable task available.
+; Restores the processor context and returns to point of execution
+; before interruption if no new scheduling is required.
+; Branches to minOS main schedule routine otherwise.
 mschedule:
 	; if all task states unchanged, continue with interrupted flow
 	ld	a,(requiresched)
@@ -110,15 +129,15 @@ mschedule:
 	ld	(ix+stask.stack),l
 	ld	(ix+stask.stack+1),h
 
-; starts the scheduling process
+; Starts minOS main scheduling process.
 ;
-; searches for runnable tasks with highest priority.
-; idles if no runnable task available.
+; Searches for next runnable tasks with highest priority.
+; Idles if no runnable task available.
 minosMain:
 	ld	sp,minosKernelStack
 	xor	a
 	ld	(requiresched),a
-	ld	hl, taskcount
+	ld	hl,taskcount
 	ld	a,(hl)
 	ld	ix,tasktable
 	ld	de,tasksize
@@ -138,7 +157,8 @@ mschedexit:
 	ei
 	halt
 
-; ix points to next runnable task
+; Restores task context and returns to task.
+; ix points to task context.
 mschedfound:
 	ld	(currenttask),ix
 	ld	l,(ix+stask.stack)
@@ -146,8 +166,8 @@ mschedfound:
 	ld	sp,hl
 	jr	minosRestoreContext
 
-; invoked by return from task when tasks ends.
-; sets task state to stopped and starts rescheduling.
+; Invoked by return from task when tasks ends.
+; Sets task state to stopped and starts scheduling.
 mschedendtask:
 	ld	ix,(currenttask)
 	ld	(ix+stask.state),stateStopped
@@ -155,12 +175,12 @@ mschedendtask:
 	ld	(currenttask),bc
 	jr	minosMain
 
-; handles the system tick when invoked by timer isr.
+; Handles the system tick when invoked by timer isr.
 ;
-; decrements counter for each priodic tasks and
+; Decrements counter for each priodic tasks and
 ; starts all tasks where period is expired.
 ;
-; aborts the system in case of attempt to restart
+; Aborts the system in case of attempt to restart
 ; a periodic task that is still running.
 ;
 ; parameters:
@@ -230,7 +250,7 @@ sterror:
 	ld	a,err_tsk_busy
 	jp	error
 
-; creates a new task using the given parameter and sets the task state to stopped
+; Creates a new task using the given parameter and sets the task state to stopped.
 ;
 ; parameters:
 ;   de = pointer to task definition
