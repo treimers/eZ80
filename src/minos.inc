@@ -4,8 +4,8 @@ ready		equ	'R'		; task state ready
 stopped		equ	'S'		; task state stopped
 
 stask		.struct			; the task structure
-prio		ds	1		; the task priority
 state		ds	1		; the current task state
+prio		ds	1		; the task priority
 period		ds	1		; the current task period
 name		ds	2		; the pointer to the task name
 stack		ds	2		; the current task stack pointer

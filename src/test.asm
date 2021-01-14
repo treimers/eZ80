@@ -20,10 +20,8 @@ test:
 	ld	(count1),hl
 	ld	(count2),hl
 	ld	(count3),hl
-
 	; load stack pointer
 	ld	sp,kernelstack
-
 	; test arithmetic
 	ld	bc,123
 	ld	hl,22
@@ -31,11 +29,9 @@ test:
 	jr	c,$			; stop on error
 	call	divide
 	jr	c,$			; stop on error
-
 	; init minos
 	call	minosinit
-
-	; test some create tasks
+	; create some test tasks
 	ld	de,taskdef1
 	call	createtask
 	jr	c,$			; stop on error
@@ -45,7 +41,7 @@ test:
 	ld	de,taskdef3
 	call	createtask
 	jr	c,$			; stop on error
-
+	; setup interrupts
 	im	2
 	ld	a,inttab >> 8 & 0ffh
 	ld	i,a

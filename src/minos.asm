@@ -5,7 +5,7 @@
 	xdef	minos
 	xdef	createtask
 	xdef	systick
-	xdef	saveregs
+	xdef	savecontext
 	xdef	kernelstack
 
 	xref	multiply
@@ -36,22 +36,23 @@ minosinit:
 	ldir
 	ret
 
-; saves the context of interrupted job.
+; saves the context of interrupted processing.
 ;
 ; parameters:
 ;   -
 ; returns:
 ;   -
-saveregs:
-	; save hl, af, bc, de
+savecontext:
+	; get return address and save hl to stack
 	ex	(sp),hl
+	; save af, bc, de to stack
 	push	af
 	push	bc
 	push	de
-	; save ix, iy
+	; save ix, iy to stack
 	push	ix
 	push	iy
-	; save af', bc', de', hl'
+	; save af', bc', de', hl' to stack
 	ex	af,af'
 	exx
 	push	af
@@ -65,18 +66,25 @@ saveregs:
 	; return to caller
 	jp	(hl)
 
-restoreregs:
-	; restore hl', de', bc', af'
+; restores the context of interrupted processing,
+; enables interrupts again and returns to point of interruption.
+;
+; parameters:
+;   -
+; returns:
+;   -
+restorecontext:
+	; restore hl', de', bc', af' from stack
 	pop	hl
 	pop	de
 	pop	bc
 	pop	af
 	ex	af,af'
 	exx
-	; restore iy, ix
+	; restore iy, ix from stack
 	pop	iy
 	pop	ix
-	; restore de', bc', af', hl'
+	; restore de, bc, af, hl from stack
 	pop	de
 	pop	bc
 	pop	af
@@ -85,11 +93,16 @@ restoreregs:
 	ei
 	ret
 
+; invokes the scheduling at end of an interrupt routine.
+;
+; restores context of interrupted processing if no new scheduling is required.
+; searches for runnable tasks with highest priority otherwise.
+; idles if no runnable task available.
 schedule:
 	; if all task states unchanged, continue with interrupted flow
 	ld	a,(requiresched)
 	or	a
-	jr	z,restoreregs
+	jr	z,restorecontext
 	; save current task if available
 	ld	bc,(currenttask)
 	ld	a,b
@@ -129,8 +142,10 @@ schedfound:
 	ld	l,(ix+stask.stack)
 	ld	h,(ix+stask.stack+1)
 	ld	sp,hl
-	jr	restoreregs
+	jr	restorecontext
 
+; invoked by return from task when tasks ends.
+; sets task state to stopped and starts rescheduling.
 schedendtask:
 	ld	ix,(currenttask)
 	ld	(ix+stask.state),stopped
@@ -138,7 +153,7 @@ schedendtask:
 	ld	(currenttask),bc
 	jr	minos
 
-; handles the system tick invoked by timer isr.
+; handles the system tick when invoked by timer isr.
 ;
 ; decrements counter for each priodic tasks and
 ; starts all tasks where period is expired.
