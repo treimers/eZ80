@@ -5,7 +5,7 @@
 	xdef	timerisr
 
 	xref	savecontext
-	xref	systick
+	xref	systemtick
 
 	include	"ez80F91.inc"
 
@@ -52,7 +52,7 @@ timerisr:
 	; save all register
 	call	savecontext
 	; invoke system tick
-	call	systick
+	call	systemtick
 	; acknowledge interrupt and return from interrupt
 	in0	a,(TMR0_IIR)
 	reti

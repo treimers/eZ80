@@ -15,7 +15,7 @@ initstack	ds	2		; the initial task stack pointer
 filler		ds	4		; fill to 16 bytes
 tasksize	.endstruct stask
 
-staskdef	.struct			; the task definition structure for task creation
+staskdef	.struct			; the task definition structure used when creating a new task
 prio		ds	1		; the task priority
 period		ds	1		; the initial task period
 pc		ds	2		; the initial program counter (start of task code)

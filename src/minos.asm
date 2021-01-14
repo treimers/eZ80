@@ -4,7 +4,7 @@
 	xdef	minosinit
 	xdef	minos
 	xdef	createtask
-	xdef	systick
+	xdef	systemtick
 	xdef	savecontext
 	xdef	kernelstack
 
@@ -23,16 +23,11 @@
 ; returns
 ;   -
 minosinit:
-	; clear vars
-	xor	a
-	ld	(taskcount),a
-	ld	(requiresched),a
-	ld	hl,tasktable
-	ld	(hl),a
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,tasksize * maxtasks-1
+	; clear variables
+	ld	hl,varbegin
+	ld	(hl),0
+	ld	de,varbegin + 1
+	ld	bc,varend - varbegin - 1
 	ldir
 	ret
 
@@ -61,7 +56,7 @@ savecontext:
 	push	hl
 	exx
 	; manipulate return address
-	ld	de,schedule
+	ld	de,mschedule
 	push	de
 	; return to caller
 	jp	(hl)
@@ -98,7 +93,7 @@ restorecontext:
 ; restores context of interrupted processing if no new scheduling is required.
 ; searches for runnable tasks with highest priority otherwise.
 ; idles if no runnable task available.
-schedule:
+mschedule:
 	; if all task states unchanged, continue with interrupted flow
 	ld	a,(requiresched)
 	or	a
@@ -114,6 +109,11 @@ schedule:
 	add	hl,sp
 	ld	(ix+stask.stack),l
 	ld	(ix+stask.stack+1),h
+
+; invokes the scheduling to complete boot process.
+;
+; searches for runnable tasks with highest priority.
+; idles if no runnable task available.
 minos:
 	ld	sp,kernelstack
 	ld	hl, taskcount
@@ -121,23 +121,23 @@ minos:
 	ld	ix,tasktable
 	ld	de,tasksize
 	or	a
-	jr	z,schedexit
+	jr	z,mschedexit
 	ld	b,a
-schedloop:
+mschedloop:
 	ld	a,(ix+stask.state)
 	cp 	ready
-	jr	z,schedfound
+	jr	z,mschedfound
 	add	ix,de
-	djnz	schedloop
+	djnz	mschedloop
 	ld	bc,0
 	ld	(currenttask),bc
-schedexit:
+mschedexit:
 	ei
-schedidle:
-	jp	schedidle
+mschedidle:
+	jp	mschedidle
 
 ; ix points to next runnable task
-schedfound:
+mschedfound:
 	ld	(currenttask),ix
 	ld	l,(ix+stask.stack)
 	ld	h,(ix+stask.stack+1)
@@ -146,7 +146,7 @@ schedfound:
 
 ; invoked by return from task when tasks ends.
 ; sets task state to stopped and starts rescheduling.
-schedendtask:
+mschedendtask:
 	ld	ix,(currenttask)
 	ld	(ix+stask.state),stopped
 	ld	bc,0
@@ -167,7 +167,7 @@ schedendtask:
 ;   -
 ; errors:
 ;   err_tsk_busy: cannot restart already running task
-systick:
+systemtick:
 	; get task table
 	ld	ix,tasktable
 	; do nothing if task table empty
@@ -198,7 +198,7 @@ stloop:
 	; ... pc & stack
 	ld	l,(ix+stask.initstack)
 	ld	h,(ix+stask.initstack+1)
-	ld	de,schedendtask
+	ld	de,mschedendtask
 	dec	hl
 	ld	(hl),d
 	dec	hl
@@ -350,7 +350,7 @@ cterror3:
 	ret
 
 	segment	data
-
+varbegin:				; begin of variable section
 taskcount:				; the count reflecting the total number of tasks
 	ds	1
 requiresched:
@@ -359,6 +359,7 @@ currenttask:
 	ds	2			; pointer to current running task
 tasktable:				; the task table
 	ds	tasksize * maxtasks
+varend:					; end of variable section
 
 	ds	32			; the kernel stack
 kernelstack:				; top of kernel stack
