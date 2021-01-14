@@ -12,4 +12,4 @@ minOS is a small real time operating system with following features
 
 Download the source code, assemble, link and deploy the software.
 
-A small test program is provided demonstrating start und usage of **minOS**.
+A small test program **test.asm** is provided demonstrating start und usage of **minOS**.
