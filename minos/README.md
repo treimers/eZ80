@@ -1,5 +1,5 @@
 # minOS
-minOS is a small real time operating system with following features
+minOS is a small real time operating system for the Z80 processor with following features
 - small kernel written in assembler
 - pre-emptive task switching
 - simply adoptable to hardware timer
