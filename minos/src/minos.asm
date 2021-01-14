@@ -3,9 +3,9 @@
 
 	xdef	minosInit
 	xdef	minosMain
-	xdef	minosCreatetask
-	xdef	minosSystemtick
-	xdef	minosSavecontext
+	xdef	minosCreateTask
+	xdef	minosSystemTick
+	xdef	minosSaveContext
 	xdef	minosKernelstack
 
 	xref	multiply
@@ -37,7 +37,7 @@ minosInit:
 ;   -
 ; returns:
 ;   -
-minosSavecontext:
+minosSaveContext:
 	; get return address and save hl to stack
 	ex	(sp),hl
 	; save af, bc, de to stack
@@ -68,7 +68,7 @@ minosSavecontext:
 ;   -
 ; returns:
 ;   -
-minosRestorecontext:
+minosRestoreContext:
 	; restore hl', de', bc', af' from stack
 	pop	hl
 	pop	de
@@ -97,7 +97,7 @@ mschedule:
 	; if all task states unchanged, continue with interrupted flow
 	ld	a,(requiresched)
 	or	a
-	jr	z,minosRestorecontext
+	jr	z,minosRestoreContext
 	; save current task if available
 	ld	bc,(currenttask)
 	ld	a,b
@@ -144,7 +144,7 @@ mschedfound:
 	ld	l,(ix+stask.stack)
 	ld	h,(ix+stask.stack+1)
 	ld	sp,hl
-	jr	minosRestorecontext
+	jr	minosRestoreContext
 
 ; invoked by return from task when tasks ends.
 ; sets task state to stopped and starts rescheduling.
@@ -169,7 +169,7 @@ mschedendtask:
 ;   -
 ; errors:
 ;   err_tsk_busy: cannot restart already running task
-minosSystemtick:
+minosSystemTick:
 	; get task table
 	ld	ix,tasktable
 	; do nothing if task table empty
@@ -241,7 +241,7 @@ sterror:
 ;   err_tsk_illprio: prio = 0 or prio = 255
 ;   err_tsk_dupprio: prio already in use
 ;   err_tsk_toomany: too many tasks
-minosCreatetask:
+minosCreateTask:
 	; get pointer to caller parameter (iy)
 	ld	iy,0
 	add	iy,de

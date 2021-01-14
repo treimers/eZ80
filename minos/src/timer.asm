@@ -4,8 +4,8 @@
 	xdef	timerInit
 	xdef	timerIsr
 
-	xref	minosSavecontext
-	xref	minosSystemtick
+	xref	minosSaveContext
+	xref	minosSystemTick
 
 	include	"ez80F91.inc"
 
@@ -50,9 +50,9 @@ timerInit:
 
 timerIsr:
 	; save all register
-	call	minosSavecontext
+	call	minosSaveContext
 	; invoke system tick
-	call	minosSystemtick
+	call	minosSystemTick
 	; acknowledge interrupt and return from interrupt
 	in0	a,(TMR0_IIR)
 	reti

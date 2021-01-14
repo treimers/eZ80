@@ -7,7 +7,7 @@
 	xref	divide
 	xref	minosInit
 	xref	minosMain
-	xref	minosCreatetask
+	xref	minosCreateTask
 	xref	inttab
 	xref	timerInit
 	xref	minosKernelstack
@@ -33,13 +33,13 @@ test:
 	call	minosInit
 	; create some test tasks
 	ld	de,taskdef1
-	call	minosCreatetask
+	call	minosCreateTask
 	jr	c,$			; stop on error
 	ld	de,taskdef2
-	call	minosCreatetask
+	call	minosCreateTask
 	jr	c,$			; stop on error
 	ld	de,taskdef3
-	;call	minosCreatetask
+	call	minosCreateTask
 	jr	c,$			; stop on error
 	; setup interrupts
 	im	2
