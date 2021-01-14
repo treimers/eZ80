@@ -44,13 +44,13 @@ rst38:
 	jr	rsterror
 nmi:
 	.org	66h
-	ld	a,err_nmi
+	ld	a,err_ctl_nmi
 	jp	error
 
 rsterror:
-	ld	a,err_restart
-	pop	hl
-	dec	hl
+	ld	a,err_ctl_restart
+	pop	bc
+	dec	bc
 	jp	error
 
 	segment	code

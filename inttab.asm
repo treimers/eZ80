@@ -5,7 +5,7 @@
 
 	xdef	inttab
 
-	xref	tm0isr
+	xref	timerisr
 	xref	error
 
 	define	inttable,space=rom,align=256
@@ -22,7 +22,7 @@ inttab:
 
 	;32 vectors
 	dw	unexp, unexp, unexp, unexp, unexp, unexp, unexp, unexp
-	dw	unexp, unexp, tm0isr, unexp, unexp, unexp, unexp, unexp
+	dw	unexp, unexp, timerisr, unexp, unexp, unexp, unexp, unexp
 	dw	unexp, unexp, unexp, unexp, unexp, unexp, unexp, unexp
 	dw	unexp, unexp, unexp, unexp, unexp, unexp, unexp, unexp
 
@@ -41,7 +41,7 @@ inttab:
 	segment	code
 
 unexp:
-	ld	a,err_interrupt
+	ld	a,err_ctl_int
 	jp	error
 
 	end

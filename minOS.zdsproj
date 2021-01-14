@@ -3,11 +3,12 @@
 
 <!-- file information -->
 <files>
-<file filter-key="">.\zeropage.asm</file>
-<file filter-key="">.\test.asm</file>
-<file filter-key="">.\minos.asm</file>
-<file filter-key="">.\util.asm</file>
-<file filter-key="">.\inttab.asm</file>
+<file filter-key="">..\src\minos.asm</file>
+<file filter-key="">..\src\test.asm</file>
+<file filter-key="">..\src\inttab.asm</file>
+<file filter-key="">..\src\timer.asm</file>
+<file filter-key="">..\src\zeropage.asm</file>
+<file filter-key="">..\src\util.asm</file>
 </files>
 
 <!-- configuration information -->
@@ -200,34 +201,6 @@
 
 <!-- breakpoint information -->
 <breakpoints>
-<breakpoint temporary="false" enabled="true" >
-<line-number>79</line-number>
-<pathname>Z:\treimers\Desktop\eZ80\minOS\minos.asm</pathname>
-<address>357</address>
-<command></command>
-<preserve-type>0</preserve-type>
-</breakpoint>
-<breakpoint temporary="false" enabled="true" >
-<line-number>68</line-number>
-<pathname>Z:\treimers\Desktop\eZ80\minOS\minos.asm</pathname>
-<address>353</address>
-<command></command>
-<preserve-type>0</preserve-type>
-</breakpoint>
-<breakpoint temporary="false" enabled="true" >
-<line-number>168</line-number>
-<pathname>Z:\treimers\Desktop\eZ80\minOS\minos.asm</pathname>
-<address>491</address>
-<command></command>
-<preserve-type>0</preserve-type>
-</breakpoint>
-<breakpoint temporary="false" enabled="true" >
-<line-number>131</line-number>
-<pathname>Z:\treimers\Desktop\eZ80\minOS\test.asm</pathname>
-<address>267</address>
-<command></command>
-<preserve-type>0</preserve-type>
-</breakpoint>
 </breakpoints>
 
 </project>

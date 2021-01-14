@@ -1,5 +1,7 @@
-err_interrupt	equ	1			; unexpected interrupt
-err_restart	equ	2			; unexpected restart operation
-err_nmi		equ	3			; unexpected nmi
-err_ill_prio	equ	4			; illegal task priority
-err_too_mntsk	equ	5			; too many tasks
+err_ctl_int	equ	1			; control flow: unexpected interrupt
+err_ctl_restart	equ	2			; control flow: unexpected restart operation
+err_ctl_nmi	equ	3			; control flow: unexpected nmi
+err_tsk_illprio	equ	4			; task: illegal priority
+err_tsk_dupprio	equ	5			; task: illegal priority
+err_tsk_toomany	equ	6			; task: too many tasks
+err_tsk_busy	equ	7			; task: periodic task still busy
