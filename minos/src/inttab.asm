@@ -5,7 +5,7 @@
 
 	xdef	inttab
 
-	xref	timerisr
+	xref	timerIsr
 	xref	error
 
 	define	inttable,space=rom,align=256
@@ -22,7 +22,7 @@ inttab:
 
 	;32 vectors
 	dw	unexp, unexp, unexp, unexp, unexp, unexp, unexp, unexp
-	dw	unexp, unexp, timerisr, unexp, unexp, unexp, unexp, unexp
+	dw	unexp, unexp, timerIsr, unexp, unexp, unexp, unexp, unexp
 	dw	unexp, unexp, unexp, unexp, unexp, unexp, unexp, unexp
 	dw	unexp, unexp, unexp, unexp, unexp, unexp, unexp, unexp
 

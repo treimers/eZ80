@@ -5,12 +5,12 @@
 
 	xref	multiply
 	xref	divide
-	xref	minosinit
-	xref	minos
-	xref	createtask
+	xref	minosInit
+	xref	minosMain
+	xref	minosCreatetask
 	xref	inttab
-	xref	timerinit
-	xref	kernelstack
+	xref	timerInit
+	xref	minosKernelstack
 
 	segment	code
 
@@ -21,7 +21,7 @@ test:
 	ld	(count2),hl
 	ld	(count3),hl
 	; load stack pointer
-	ld	sp,kernelstack
+	ld	sp,minosKernelstack
 	; test arithmetic
 	ld	bc,123
 	ld	hl,22
@@ -30,25 +30,25 @@ test:
 	call	divide
 	jr	c,$			; stop on error
 	; init minos
-	call	minosinit
+	call	minosInit
 	; create some test tasks
 	ld	de,taskdef1
-	call	createtask
+	call	minosCreatetask
 	jr	c,$			; stop on error
 	ld	de,taskdef2
-	call	createtask
+	call	minosCreatetask
 	jr	c,$			; stop on error
 	ld	de,taskdef3
-	call	createtask
+	;call	minosCreatetask
 	jr	c,$			; stop on error
 	; setup interrupts
 	im	2
 	ld	a,inttab >> 8 & 0ffh
 	ld	i,a
 	; init timer
-	call	timerinit
+	call	timerInit
 	; start minos
-	jp	minos
+	jp	minosMain
 
 taskdef1:
 	db	2			;prio

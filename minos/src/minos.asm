@@ -1,12 +1,12 @@
 	cpu=EZ80F91
 	.assume	adl=0			;Z80-Mode
 
-	xdef	minosinit
-	xdef	minos
-	xdef	createtask
-	xdef	systemtick
-	xdef	savecontext
-	xdef	kernelstack
+	xdef	minosInit
+	xdef	minosMain
+	xdef	minosCreatetask
+	xdef	minosSystemtick
+	xdef	minosSavecontext
+	xdef	minosKernelstack
 
 	xref	multiply
 	xref	error
@@ -22,7 +22,7 @@
 ;   -
 ; returns
 ;   -
-minosinit:
+minosInit:
 	; clear variables
 	ld	hl,varbegin
 	ld	(hl),0
@@ -37,7 +37,7 @@ minosinit:
 ;   -
 ; returns:
 ;   -
-savecontext:
+minosSavecontext:
 	; get return address and save hl to stack
 	ex	(sp),hl
 	; save af, bc, de to stack
@@ -68,7 +68,7 @@ savecontext:
 ;   -
 ; returns:
 ;   -
-restorecontext:
+minosRestorecontext:
 	; restore hl', de', bc', af' from stack
 	pop	hl
 	pop	de
@@ -97,12 +97,12 @@ mschedule:
 	; if all task states unchanged, continue with interrupted flow
 	ld	a,(requiresched)
 	or	a
-	jr	z,restorecontext
+	jr	z,minosRestorecontext
 	; save current task if available
 	ld	bc,(currenttask)
 	ld	a,b
 	or	c
-	jr	z,minos
+	jr	z,minosMain
 	ld	ix,0
 	add	ix,bc
 	ld	hl,0
@@ -110,12 +110,14 @@ mschedule:
 	ld	(ix+stask.stack),l
 	ld	(ix+stask.stack+1),h
 
-; invokes the scheduling to complete boot process.
+; starts the scheduling process
 ;
 ; searches for runnable tasks with highest priority.
 ; idles if no runnable task available.
-minos:
-	ld	sp,kernelstack
+minosMain:
+	ld	sp,minosKernelstack
+	xor	a
+	ld	(requiresched),a
 	ld	hl, taskcount
 	ld	a,(hl)
 	ld	ix,tasktable
@@ -131,10 +133,10 @@ mschedloop:
 	djnz	mschedloop
 	ld	bc,0
 	ld	(currenttask),bc
+	; nothing found, enable interrupts and wait for wake by interrupt
 mschedexit:
 	ei
-mschedidle:
-	jp	mschedidle
+	halt
 
 ; ix points to next runnable task
 mschedfound:
@@ -142,7 +144,7 @@ mschedfound:
 	ld	l,(ix+stask.stack)
 	ld	h,(ix+stask.stack+1)
 	ld	sp,hl
-	jr	restorecontext
+	jr	minosRestorecontext
 
 ; invoked by return from task when tasks ends.
 ; sets task state to stopped and starts rescheduling.
@@ -151,7 +153,7 @@ mschedendtask:
 	ld	(ix+stask.state),stopped
 	ld	bc,0
 	ld	(currenttask),bc
-	jr	minos
+	jr	minosMain
 
 ; handles the system tick when invoked by timer isr.
 ;
@@ -167,7 +169,7 @@ mschedendtask:
 ;   -
 ; errors:
 ;   err_tsk_busy: cannot restart already running task
-systemtick:
+minosSystemtick:
 	; get task table
 	ld	ix,tasktable
 	; do nothing if task table empty
@@ -239,7 +241,7 @@ sterror:
 ;   err_tsk_illprio: prio = 0 or prio = 255
 ;   err_tsk_dupprio: prio already in use
 ;   err_tsk_toomany: too many tasks
-createtask:
+minosCreatetask:
 	; get pointer to caller parameter (iy)
 	ld	iy,0
 	add	iy,de
@@ -362,6 +364,6 @@ tasktable:				; the task table
 varend:					; end of variable section
 
 	ds	32			; the kernel stack
-kernelstack:				; top of kernel stack
+minosKernelstack:			; top of kernel stack
 
 	end

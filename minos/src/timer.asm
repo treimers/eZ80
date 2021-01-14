@@ -1,11 +1,11 @@
 	cpu=EZ80F91
 	.assume	adl=0			;Z80-Mode
 
-	xdef	timerinit
-	xdef	timerisr
+	xdef	timerInit
+	xdef	timerIsr
 
-	xref	savecontext
-	xref	systemtick
+	xref	minosSavecontext
+	xref	minosSystemtick
 
 	include	"ez80F91.inc"
 
@@ -33,7 +33,7 @@ TMR0_RR_H_IP    EQU	TMR_VALUE >> 8
 
 segment	code
 
-timerinit:
+timerInit:
 	;Control Register initialisieren
 	ld	a,TMR0_CTL_IP
 	out0	(TMR0_CTL),a
@@ -48,11 +48,11 @@ timerinit:
 	out0	(TMR0_RR_H),A
 	ret
 
-timerisr:
+timerIsr:
 	; save all register
-	call	savecontext
+	call	minosSavecontext
 	; invoke system tick
-	call	systemtick
+	call	minosSystemtick
 	; acknowledge interrupt and return from interrupt
 	in0	a,(TMR0_IIR)
 	reti
