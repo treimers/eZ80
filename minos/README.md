@@ -46,7 +46,7 @@ Feature versions of minOS will support further operations like task deletion **m
 
 ## Interrupts
 
-minOS provides an API function **minosSaveContext** for interrupt services routines that must be invoked prior to any calls of kernel functions from an interrupt handler.
+An API function **minosSaveContext** is available for interrupt services routines that must be invoked prior to any calls to kernel routines from an interrupt handler.
 
 A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. The time interrupt handler must ensure that minOS system tick handling is invoked by calling **minosSystemTick** on every interrupt by the timer.
 
