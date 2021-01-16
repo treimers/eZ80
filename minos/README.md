@@ -2,10 +2,9 @@
 minOS is a tiny real time operating system for the Z80 processor with following features
 
 - small kernel written in assembler
-- pre-emptive task switching
+- task scheduling based on priorities (pre-emptive task switching)
 - simply adoptable to hardware timer
-- support for concurrent tasks and task switching
-- task scheduling based on priorities
+- support for concurrent task execution 
 - support for periodic tasks
 - utility routines for isr (interupt service routines)
 
@@ -17,7 +16,7 @@ A small test program **test.asm** is provided demonstrating start und usage of *
 
 ## Introduction
 
-Embedded application can benefit from minOS multi tasking support allowing developers to structure and divide their solutions into logical parts that can be run independently and in parallel.
+Embedded applications can benefit from minOS multi tasking support allowing developers to structure and divide their solutions into logical parts that can be run independently and in parallel.
 
 minOS offers a task management based on task priority. Pre-emptive scheduling ensures the appropriate reactions to real time events and and the correct activities such as interrupt handling and task switching.
 
@@ -52,7 +51,7 @@ A timer interrupt is required to perform management of periodic tasks and trigge
 
 ## Scheduler
 
-minOS scheduling is based on task priorities. When a task with priority higher than that of the currently running task the scheduler will perform a task change on next invocation. This approach is called pre-emptive scheduling.
+minOS scheduling is based on task priorities. When a task with priority higher than that of the currently running task is activated the scheduler will perform a task switch on next invocation. This approach is called pre-emptive scheduling.
 
 ## Tasks
 
