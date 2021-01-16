@@ -30,8 +30,8 @@ minOS is written in Assembler and is by that small and fast.
 
 minOS comes with two main routines that must be called in order to initialise and start it:
 
-- minosInit
-- minosStart
+- **minosInit**
+- **minosStart**
 
 **minosInit** must be called prior to use any minOS functionality. The initialization will take care to set up all internal data structure.
 
@@ -39,14 +39,17 @@ After boot set up of a system including preparation of on-chip or external hardw
 
 ## Task Management
 
-minOS provides a task creation routine. This can be called during initial setup as well as during runtime in order to create new tasks that are taken into account by the scheduler.
+minOS provides a task creation routine **minosCreateTask**. This can be called during initial setup as well as during runtime in order to create new tasks that are taken into account by the scheduler.
 
-Feature versions of minOS will support further operations like task deletion, task wait or task wake or others.
+Feature versions of minOS will support further operations like task deletion **minosDeleteTask**, task wait **minosWait**, wake a task **minoWake** and others.
 
 ## Interrupts
 
-minOs comes with interrupt support allowing interrupt service routines to call kernel functions like task management.
+minOS provides an API function **minoSaveContext** for interrupt services routines that must be invoked prior to andy call of kernel functions like task management from an interrupt handler.
 
-A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. minOS provides simple and fast functions that help implementing responsive interrupt service routines.
+A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. The time interrupt handler must ensure that minOS system tick handling is invoked via calls to **minoSystemTick**.
 
-## Scheduler and Tasks
+## Scheduler
+
+## Tasks
+
