@@ -52,5 +52,7 @@ A timer interrupt is required to perform management of periodic tasks and trigge
 
 ## Scheduler
 
+minOS scheduling is based on task priorities. When a task with priority higher than that of the currently running task the scheduler will perform a task change on next invocation. This approach is called pre-emptive scheduling.
+
 ## Tasks
 
