@@ -71,15 +71,16 @@ task:
 stack:
 ```
 
-Feature versions of minOS will support further operations like task deletion **minosDeleteTask**, task wait **minosWait**, wake of tasks **minosWake** and others.
+:warning: NOTE: Future versions of minOS will support further operations like task deletion **minosDeleteTask**, task wait **minosWait**, wake of tasks **minosWake** and others.
 
 ## Interrupts
 
 An API function **minosSaveContext** is available for interrupt services routines that must be invoked prior to any calls to kernel routines from an interrupt handler.
 
 ```
-uart_isr:
+uartIsr:
 	call	minosSaveContext
+	call	minosXXX
 	...
 	reti
 ```
@@ -87,11 +88,13 @@ uart_isr:
 A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. The time interrupt handler must ensure that minOS system tick handling is invoked by calling **minosSystemTick** on every interrupt by the timer.
 
 ```
-timer_isr:
+timerIsr:
 	call	minosSaveContext
 	call	minosSystemTick
+	...
 	reti
 ```
+:warning: NOTE: Interrupts must never be enabled by an interrupt service routine after calling minosSaveContext!
 
 ## Scheduler
 
