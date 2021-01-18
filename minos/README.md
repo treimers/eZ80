@@ -42,6 +42,8 @@ After initialisation of a system including preparation of on-chip or external ha
 minOS provides a task creation routine **minosCreateTask**. This can be called during initial setup as well as during runtime in order to create new tasks that are taken into account by the minOS scheduler.
 
 ```
+	segment	code
+
 	ld	de,taskdef
 	call	minosCreateTask
 	jr	c,error
@@ -63,6 +65,8 @@ task:
 	ld	(count),hl
 	ret
 
+	segment	data
+
 	ds	32
 stack:
 ```
@@ -76,8 +80,8 @@ An API function **minosSaveContext** is available for interrupt services routine
 ```
 uart_isr:
 	call	minosSaveContext
-  ...
-  reti
+	...
+	reti
 ```
 
 A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. The time interrupt handler must ensure that minOS system tick handling is invoked by calling **minosSystemTick** on every interrupt by the timer.
@@ -85,8 +89,8 @@ A timer interrupt is required to perform management of periodic tasks and trigge
 ```
 timer_isr:
 	call	minosSaveContext
-  call	minosSystemTick
-  reti
+	call	minosSystemTick
+	reti
 ```
 
 ## Scheduler
