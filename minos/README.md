@@ -94,7 +94,7 @@ timerIsr:
 	...
 	reti
 ```
-:warning: NOTE: Interrupts must never be enabled by an interrupt service routine after calling minosSaveContext!
+:warning: NOTE: Interrupts must never \(!\) be enabled by an interrupt service routine after calling minosSaveContext!
 
 ## Scheduler
 
