@@ -71,7 +71,7 @@ task:
 stack:
 ```
 
-:warning: NOTE: Future versions of minOS will support further operations like task deletion **minosDeleteTask**, task wait **minosWait**, wake of tasks **minosWake** and others.
+ :bulb: NOTE: Future versions of minOS will support other operations like task deletion **minosDeleteTask**, task wait **minosWait**, wake of tasks **minosWake** and others.
 
 ## Interrupts
 
@@ -94,7 +94,7 @@ timerIsr:
 	...
 	reti
 ```
-:warning: NOTE: Interrupts must never \(!\) be enabled by an interrupt service routine after calling minosSaveContext!
+:bulb: NOTE: Interrupts must never \(!\) be enabled by an interrupt service routine after calling minosSaveContext!
 
 ## Scheduler
 
