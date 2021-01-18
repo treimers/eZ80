@@ -100,5 +100,12 @@ timerIsr:
 
 minOS scheduling is based on task priorities. When a task with priority higher than that of the currently running task is activated the scheduler will perform a task switch on next invocation. This approach is called pre-emptive scheduling.
 
+The scheduling is triggered in the following situations:
+
+- the currently running tasks ends by a return
+- an interrupt service routine that has called minosSaveContext is ending
+- a task state is changed by a task or by an interrupt service rotuine (start task, stop task, etc.)
+- the system tick routine has started a periodic task
+
 ## Tasks
 
