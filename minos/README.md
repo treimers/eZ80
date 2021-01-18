@@ -41,13 +41,53 @@ After initialisation of a system including preparation of on-chip or external ha
 
 minOS provides a task creation routine **minosCreateTask**. This can be called during initial setup as well as during runtime in order to create new tasks that are taken into account by the minOS scheduler.
 
+```
+	ld  de,taskdef
+	call	minosCreateTask
+	jr  c,error
+	...
+  
+taskdef:
+	db	2   ;prio
+	db	1   ;period
+	dw	task  ;pc
+	dw	stack ;stack
+	dw	name  ;name
+  
+name:
+	db	'task',0
+  
+task:
+	ld	hl,(count)
+	inc	hl
+	ld	(count),hl
+	ret
+
+	ds	32
+stack:
+```
+
 Feature versions of minOS will support further operations like task deletion **minosDeleteTask**, task wait **minosWait**, wake of tasks **minosWake** and others.
 
 ## Interrupts
 
 An API function **minosSaveContext** is available for interrupt services routines that must be invoked prior to any calls to kernel routines from an interrupt handler.
 
+```
+uart_isr:
+	call	minosSaveContext
+  ...
+  reti
+```
+
 A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. The time interrupt handler must ensure that minOS system tick handling is invoked by calling **minosSystemTick** on every interrupt by the timer.
+
+```
+timer_isr:
+	call	minosSaveContext
+  call	minosSystemTick
+  reti
+```
 
 ## Scheduler
 
