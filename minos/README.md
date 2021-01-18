@@ -42,17 +42,17 @@ After initialisation of a system including preparation of on-chip or external ha
 minOS provides a task creation routine **minosCreateTask**. This can be called during initial setup as well as during runtime in order to create new tasks that are taken into account by the minOS scheduler.
 
 ```
-	ld  de,taskdef
+	ld	de,taskdef
 	call	minosCreateTask
-	jr  c,error
+	jr	c,error
 	...
   
 taskdef:
-	db	2   ;prio
-	db	1   ;period
-	dw	task  ;pc
-	dw	stack ;stack
-	dw	name  ;name
+	db	2	;prio
+	db	1	;period
+	dw	task	;pc
+	dw	stack	;stack
+	dw	name	;name
   
 name:
 	db	'task',0
