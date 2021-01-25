@@ -1,5 +1,5 @@
 # minOS
-minOS is a small real time operating system for the Z80 processor with following features
+minOS stands for **mini OS** and is a small real time operating system for the Z80 processor with following features
 - small kernel written in assembler
 - pre-emptive task switching
 - simply adoptable to hardware timer
@@ -45,7 +45,7 @@ Feature versions of minOS will support further operations like task deletion, ta
 
 ## Interrupts
 
-minOs comes with interrupt support allowing interrupt service routines to call kernel functions like task management.
+minOS comes with interrupt support allowing interrupt service routines to call kernel functions like task management.
 
 A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. minOS provides simple and fast functions that help implementing responsive interrupt service routines.
 
