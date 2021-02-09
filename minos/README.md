@@ -76,4 +76,36 @@ stack:
 
 minOS comes with interrupt support allowing interrupt service routines to call kernel functions like task management.
 
+An API function **minosSaveContext** is available for interrupt services routines that must be invoked prior to any calls to kernel routines from an interrupt handler.
+
+```
+uartIsr:
+	call	minosSaveContext
+	call	minosXXX
+	...
+	reti
+```
+
+A timer interrupt is required to perform management of periodic tasks and trigger recurring scheduling activities. The time interrupt handler must ensure that minOS system tick handling is invoked by calling **minosSystemTick** on every interrupt by the timer.
+
+```
+timerIsr:
+	call	minosSaveContext
+	call	minosSystemTick
+	...
+	reti
+```
+:bulb: NOTE: Interrupts must never \(!\) be enabled by an interrupt service routine after calling minosSaveContext!
+
+## Scheduler
+
+minOS scheduling is based on task priorities. When a task with priority higher than that of the currently running task is activated the scheduler will perform a task switch on next invocation. This approach is called pre-emptive scheduling.
+
+Scheduling will take place in the following situation, among others
+
+- the currently running tasks ends by a return
+- an interrupt service routine that called minosSaveContext is ending
+- a task state is changed by a task or by an interrupt service rotuine (start task, stop task, etc.)
+- the system tick routine has started a periodic task
+
 ## Tasks
